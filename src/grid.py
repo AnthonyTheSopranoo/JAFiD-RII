@@ -1,22 +1,28 @@
 import jax
 import jax.numpy as jnp
-import nump as np
-from jax.typing import Array
-
-rng = np.random.default_rng(42)
+import numpy as np
 
 
-def C_base_state(X, dphi: float):
+def C_base_state(X, dphi):
     return 1 / (jnp.exp(dphi * X) + 1)
 
 
-def phi_base_state(X, dphi, phi0: float):
+def phi_base_state(X, phi0, dphi):
     return phi0 + dphi * (1 / (jnp.exp(dphi * X) + 1))
 
 
 def generate_grid(
-    Ly: int, Ny: int, Lx: int
-) -> tuple[Array, Array, float, float, float, int]:
+    Ly: float | jax.Array,
+    Ny: int,
+    Lx: float | jax.Array,
+) -> tuple[
+    jax.Array,
+    jax.Array,
+    float | jax.Array,
+    float | jax.Array,
+    float,
+    int,
+]:
     dy = Ly / (Ny)
 
     dx = dy
@@ -31,13 +37,18 @@ def generate_grid(
 
 
 def generate_initial_conditions(
-    X, amplitude, dphi: float, phi0: float, Ny: int, x0: float = 0
-) -> tuple[Array, Array]:
-
+    X: jax.Array,
+    amplitude: float,
+    phi0: float,
+    dphi: float,
+    x0: float,
+    Ny: int,
+    rng: np.random.Generator = np.random.default_rng(42),
+) -> tuple[jax.Array, jax.Array]:
     zet = x0 + amplitude * rng.standard_normal(Ny)
 
     C_base = C_base_state(X, dphi)
 
-    phi_base = phi_base_state(X - zet[:, None], dphi, phi0)
+    phi_base = phi_base_state(X - zet[:, None], phi0, dphi)
 
     return C_base, phi_base

@@ -1,3 +1,5 @@
+from functools import partial
+
 import jax
 import jax.numpy as jnp
 
@@ -58,9 +60,6 @@ def prolongation_y(array):
     )
 
     return fine_grid_y
-
-
-from functools import partial
 
 
 @jax.jit
@@ -140,7 +139,7 @@ def smooth_psi(psi_init, phi, f, dx, dy, n_iter, omega=2 / 3):
 
 def V_cycle(psi, phi, f, dx, dy, num_levels, level=1):
     if num_levels == level:
-        return smooth_psi(psi, phi, f, dx, dy, n_iter=50)  # coarse "solve"
+        return smooth_psi(psi, phi, f, dx, dy, n_iter=20)  # coarse "solve"
 
     u_smoothed = smooth_psi(psi, phi, f, dx, dy, n_iter=1)
 
@@ -169,7 +168,7 @@ def V_cycle(psi, phi, f, dx, dy, num_levels, level=1):
 
 
 @partial(jax.jit, static_argnames="num_levels")
-def solve_psi_jit(phi, psi_init, dx, dy, num_levels, psi_tol=5e-8, psi_maxiter=50):
+def solve_psi_jit(phi, psi_init, dx, dy, num_levels, psi_tol=1e-7, psi_maxiter=5500):
     f = source_psi(phi, dy)
 
     def cond(state):
