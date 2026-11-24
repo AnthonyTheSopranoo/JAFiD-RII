@@ -1,12 +1,13 @@
 import jax
 import jax.numpy as jnp
-import typing
-from jax.typing import Array
 
 
 @jax.jit
-def get_velocities(psi: Array):
-
+def get_velocities(
+    psi: jax.Array,
+    dx: float | jax.Array,
+    dy: float | jax.Array,
+) -> tuple[jax.Array, jax.Array]:
     qx = 1 + ((jnp.roll(psi, -1, axis=0) - jnp.roll(psi, 1, axis=0)) / (2 * dy))
 
     qy = jnp.zeros_like(psi)
@@ -16,9 +17,7 @@ def get_velocities(psi: Array):
 
 
 @jax.jit
-def RHS(
-    phi: Array, psi: Array, C: Array, dx: float, dy: float, H: float, W: float
-) -> Array:
+def RHS(phi, psi, C, H: float, W: float, dx, dy):
     C_mid = C[:, 1:-1]
 
     C_left = C[:, :-2]
@@ -41,7 +40,7 @@ def RHS(
     phi_half_y_pos = (phi_mid + phi_up) / 2
     phi_half_y_neg = (phi_mid + phi_down) / 2
 
-    qx, qy = get_velocities(psi)
+    qx, qy = get_velocities(psi, dx, dy)
 
     qx_mid = qx[:, 1:-1]
     qx_left = qx[:, :-2]
@@ -88,7 +87,7 @@ def RHS(
 
 
 @jax.jit
-def RHS_phi(C: Array, phi: Array, dx: float, dy: float, S: float, W: float) -> Array:
+def RHS_phi(C, phi, W, S, dx):
     phi_x = jnp.zeros_like(phi)
 
     phi_x = phi_x.at[:, :-2].set(
