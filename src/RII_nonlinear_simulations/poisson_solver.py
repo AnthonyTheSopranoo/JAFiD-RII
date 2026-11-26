@@ -139,7 +139,7 @@ def smooth_psi(psi_init, phi, f, dx, dy, n_iter, omega=2 / 3):
 
 def V_cycle(psi, phi, f, dx, dy, num_levels, level=1):
     if num_levels == level:
-        return smooth_psi(psi, phi, f, dx, dy, n_iter=20)  # coarse "solve"
+        return smooth_psi(psi, phi, f, dx, dy, n_iter=20)  
 
     u_smoothed = smooth_psi(psi, phi, f, dx, dy, n_iter=1)
 
@@ -148,7 +148,7 @@ def V_cycle(psi, phi, f, dx, dy, num_levels, level=1):
     restricted_x = restriction_x(res)
     restricted_residual = restriction_y(restricted_x)
 
-    phi_coarse = phi[::2, ::2]  # injection
+    phi_coarse = phi[::2, ::2] 
 
     e_c = V_cycle(
         jnp.zeros_like(restricted_residual),
@@ -162,7 +162,7 @@ def V_cycle(psi, phi, f, dx, dy, num_levels, level=1):
 
     u = u_smoothed + prolongation_y(prolongation_x(e_c))
 
-    u = smooth_psi(u, phi, f, dx, dy, n_iter=1)  # was psi
+    u = smooth_psi(u, phi, f, dx, dy, n_iter=1) 
 
     return u
 

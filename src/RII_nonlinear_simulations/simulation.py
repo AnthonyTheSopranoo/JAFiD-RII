@@ -116,9 +116,11 @@ if __name__ == "__main__":
     Lx = 5 * Ly
     Ny = 128
     dt = 7e-4
-    Nt = 100000
+    Nt = 1000000
     snapshot_interval = 10000
 
     C_history, phi_history, psi_history, t_history = solver(
         H, S, W, phi0, Ly, Ny, Lx, dt, Nt, snapshot_interval, phi1=phi1
     )
+    
+
